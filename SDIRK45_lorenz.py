@@ -26,7 +26,7 @@ A = np.array([
 B = np.array([25/24, -49/48, 125/16, -85/12, 1/4])
 ######################################################
 
-h=0.01           #time-step size
+h=0.1           #time-step size
 
 y0 = np.array([1.5,2.5,15])  #initial conditions
 ODE = Lorenz
@@ -96,25 +96,25 @@ for i in range(len(t)):
             w[m] = w_old[m] + h*np.dot( B, kw[m] )
             
         wp = []
+        wp_norm = []
         for l in range(len(w)):
             wp_x = np.zeros(len(w[l]))
             np.copyto(wp_x,w[l])
             for m in range(l-1,-1,-1):
                 wp_x += -np.dot(w[l],wp[m])*wp[m]
-            wp.append(wp_x)
+            wp_norm.append(norm(wp_x))
+            wp.append(wp_x/norm(wp_x))
         wp = np.array(wp)
-                
-        e = e + log(norm(wp,axis=1))
+        wp_norm = np.array(wp_norm)
+
+        e = e + log(wp_norm)
         
         if int((t[i]-t_trans)/lam_output_time)>lam_output_count:
             tlam.append(t[i])
             lam.append(e/(t[i]-t_trans))
             lam_output_count += 1
-        
-        for m in range(len(w)):
-            w[m] = wp[m]/norm(wp[m])
             
-        np.copyto(w_old,w)
+        np.copyto(w_old,wp)
     
     
     
